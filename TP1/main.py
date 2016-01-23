@@ -1,4 +1,8 @@
 import math
+import time
+import matplotlib.pyplot as pyplot
+from matplotlib.pyplot import Figure, subplot
+from smallestenclosingcircle import make_circle
 
 min_x = 0
 min_y = 0
@@ -30,7 +34,7 @@ def search(Positions, K, C):
     global positions
     global max_r
     global r_step
-    max_r =  math.ceil(math.sqrt((max_x - min_x) ** 2 + (max_y - min_y) ** 2) / 2)
+    max_r =  min(math.ceil(math.sqrt((max_x - min_x) ** 2 + (max_y - min_y) ** 2) / 2), K/C)
     r_step = max_r / 10
     positions = Positions
 
@@ -48,24 +52,28 @@ def search(Positions, K, C):
     
     while frontier:
         current = min(frontier, key=lambda x: x.cost(K,C) + heuristic(x))
-
         if current.is_solution():
             print(current)
             break
         
-        frontier = frontier.union(childs(current))
+        frontier = frontier.union(current.childs())
         frontier.remove(current)
+        
+    return current
 
+
+def max_radius(K, C):
+    return K/C;
 
 def heuristic(state):
     return 0;
 
 def childs(state):
     children = set()
-    for i in range(min_x, max_x, x_step):
-        for j in range(min_y, max_y, y_step):
+    for i in range(min_x, max_x, int(x_step)):
+        for j in range(min_y, max_y, int(y_step)):
             for k in range(1, int(max_r), int(r_step)):
-                if is_useful((i,j,k), state.remaining_positions) and len(children) < 10:
+                if is_useful((i,j,k), state.remaining_positions):
                     child = State(state.antennas, state.remaining_positions)
                     child.add_antenna((i,j,k))
                     children.add(child)
@@ -91,7 +99,7 @@ class State:
         self.remaining_positions = list(remaining_positions)
 
     def cost(self, K, C):
-        return sum([K + C * antenna[2] for antenna in self.antennas])
+        return sum([K + C * antenna[2]**2 for antenna in self.antennas])
 
     def verify_cover(self, position, antenna):
         return dist_squared(position, (antenna[0], antenna[1])) <= antenna[2] ** 2
@@ -106,11 +114,44 @@ class State:
     def is_solution(self):
         return not self.remaining_positions
 
+    def childs(self):
+        children = []
+        for pos in self.remaining_positions:
+            child = State(self.antennas, self.remaining_positions)
+            #On trouve l'antenne la plus proche
+            if not self.antennas:
+                child.add_antenna((pos[0], pos[1], 1))
+            else:
+                closest_antenna = min(child.antennas, key=lambda x : dist_squared(pos, (x[0],x[1])))
+                #les points couvert par l'antenne
+                covered_points = [p for p in positions if child.verify_cover(p, closest_antenna)]
+                covered_points.append(pos)
+                new_antenna = make_circle(covered_points)
+                if((200+1*new_antenna[2]**2) > (200+1*closest_antenna[2]**2 + 200)):
+                   new_antenna = (pos[0], pos[1], 1)
+                else:
+                    child.antennas.remove(closest_antenna)
+                child.add_antenna(new_antenna)
+            children.append(child)
+        return children
+
+
     def __str__(self):
         return str(self.antennas)
 
 def main():
-    search([(30, 0), (10, 10), (20, 30), (30, 40), (50, 40)], 200, 1)
+    points = [(30, 0), (10, 10), (20, 30), (30, 40), (50, 40), (80, 15), (95, 40)];
+    fig=pyplot.figure(1)
+    ax = fig.add_subplot(1,1,1)
+    pyplot.scatter(*zip(*points))
+    before = time.clock()
+    result = search(points, 200, 1)
+    temp = time.clock() - before
+    print("Temps: " + str(temp))
+    for antenna in result.antennas:
+        circle = pyplot.Circle((antenna[0],antenna[1]), antenna[2], color='g', fill=False)
+        ax.add_patch(circle)
+    pyplot.show()
 
 if __name__ == "__main__":
     main()
