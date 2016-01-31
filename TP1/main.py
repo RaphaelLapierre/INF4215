@@ -39,7 +39,7 @@ def search(Positions, K, C):
     positions = Positions
 
     frontier = set()
-    frontier.add(State([], Positions))
+    frontier.add(State({}, Positions))
     current = None
 
     print(min_x)
@@ -56,7 +56,8 @@ def search(Positions, K, C):
             print(current)
             break
         
-        frontier = frontier.union(current.childs())
+        childs = current.childs()
+        frontier = frontier.union(childs)
         frontier.remove(current)
         
     return current
@@ -91,12 +92,12 @@ def dist_squared(pos1, pos2):
 
 
 class State:
-    antennas = []
-    remaining_positions = []
+    antennas = tuple()
+    remaining_positions = tuple()
 
     def __init__(self, antennas, remaining_positions):
-        self.antennas = list(antennas)
-        self.remaining_positions = list(remaining_positions)
+        self.antennas = tuple(antennas)
+        self.remaining_positions = tuple(remaining_positions)
 
     def cost(self, K, C):
         return sum([K + C * antenna[2]**2 for antenna in self.antennas])
@@ -104,9 +105,12 @@ class State:
     def verify_cover(self, position, antenna):
         return dist_squared(position, (antenna[0], antenna[1])) <= antenna[2] ** 2
 
+    def verify_cover2(self, position):
+        return any(self.verify_cover(position, antenna) for antenna in self.antennas)
+
     def add_antenna(self, antenna):
-        self.antennas.append(antenna)
-        self.remaining_positions = [pos for pos in self.remaining_positions if not self.verify_cover(pos, antenna)]
+        self.antennas = self.antennas + (antenna, )
+        self.remaining_positions = tuple([pos for pos in self.remaining_positions if not self.verify_cover(pos, antenna)])
 
     def dist_squared(self, pos1, pos2):
         return (pos1[0] - pos2[0]) ** 2 + (pos1[1] - pos2[1]) ** 2
@@ -130,17 +134,26 @@ class State:
                 if((200+1*new_antenna[2]**2) > (200+1*closest_antenna[2]**2 + 200)):
                    new_antenna = (pos[0], pos[1], 1)
                 else:
-                    child.antennas.remove(closest_antenna)
+                    child.antennas = tuple([ant for ant in child.antennas if ant != closest_antenna])
                 child.add_antenna(new_antenna)
             children.append(child)
         return children
 
+    def __eq__(self, other):
+        return other and sorted(self.antennas) == sorted(other.antennas)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self, **kwargs):
+        return hash(self.antennas)
 
     def __str__(self):
         return str(self.antennas)
 
 def main():
-    points = [(30, 0), (10, 10), (20, 30), (30, 40), (50, 40), (80, 15), (95, 40)];
+    points = [(30, 0), (10, 10), (25,20),(20, 30), (30, 40), (40, 50), (30, 99)];
+    #points = [(30, 0), (10, 10), (25,20)];
     fig=pyplot.figure(1)
     ax = fig.add_subplot(1,1,1)
     pyplot.scatter(*zip(*points))
@@ -151,6 +164,13 @@ def main():
     for antenna in result.antennas:
         circle = pyplot.Circle((antenna[0],antenna[1]), antenna[2], color='g', fill=False)
         ax.add_patch(circle)
+
+    limx = pyplot.xlim()
+    limy = pyplot.ylim()
+    pyplot.xlim(0, max(limy[1], limx[1]))
+    pyplot.ylim(0, max(limy[1], limx[1]))
+
+
     pyplot.show()
 
 if __name__ == "__main__":

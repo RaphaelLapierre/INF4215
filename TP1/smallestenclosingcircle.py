@@ -42,7 +42,7 @@ def make_circle(points):
             c = _make_circle_one_point(shuffled[0 : i + 1], p)
 
     if c is not None:
-        c = (c[0], c[1], math.ceil(c[2]))
+        c = (int(round(c[0])), int(round(c[1])), int(round(c[2]))+1)
     return c
 
 
