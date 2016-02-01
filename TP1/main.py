@@ -1,8 +1,10 @@
 import math
+import random
 import time
 import matplotlib.pyplot as pyplot
 from matplotlib.pyplot import Figure, subplot
 from smallestenclosingcircle import make_circle
+
 
 min_x = 0
 min_y = 0
@@ -42,13 +44,14 @@ def search(Positions, K, C):
     frontier.add(State({}, Positions))
     current = None
 
-    print(min_x)
-    print(max_x)
-    print(min_y)
-    print(max_y)
-    print(x_step)
-    print(y_step)
-    print(r_step)
+#    print(min_x)
+#    print(max_x)
+#    print(min_y)
+#    print(max_y)
+#    print(x_step)
+#    print(y_step)
+#    print(r_step)
+
     
     while frontier:
         current = min(frontier, key=lambda x: x.cost(K,C) + heuristic(x))
@@ -105,12 +108,9 @@ class State:
     def verify_cover(self, position, antenna):
         return dist_squared(position, (antenna[0], antenna[1])) <= antenna[2] ** 2
 
-    def verify_cover2(self, position):
-        return any(self.verify_cover(position, antenna) for antenna in self.antennas)
-
     def add_antenna(self, antenna):
         self.antennas = self.antennas + (antenna, )
-        self.remaining_positions = tuple([pos for pos in self.remaining_positions if not self.verify_cover(pos, antenna)])
+        #self.remaining_positions = tuple([pos for pos in self.remaining_positions if not self.verify_cover(pos, antenna)])
 
     def dist_squared(self, pos1, pos2):
         return (pos1[0] - pos2[0]) ** 2 + (pos1[1] - pos2[1]) ** 2
@@ -120,23 +120,25 @@ class State:
 
     def childs(self):
         children = []
-        for pos in self.remaining_positions:
-            child = State(self.antennas, self.remaining_positions)
-            #On trouve l'antenne la plus proche
-            if not self.antennas:
-                child.add_antenna((pos[0], pos[1], 1))
+        child = State(self.antennas, self.remaining_positions)
+        if not self.antennas:
+            pos = child.remaining_positions[0]
+            child.add_antenna((pos[0], pos[1], 1))
+            child.remaining_positions = tuple([p for p in child.remaining_positions if p != pos])
+        else:
+            pos = min(self.remaining_positions, key=lambda p : dist_squared(p, self.antennas[-1]))
+            closest_antenna = min(child.antennas, key=lambda x : dist_squared(pos, (x[0],x[1])))
+            #les points couvert par l'antenne
+            covered_points = [p for p in positions if child.verify_cover(p, closest_antenna)]
+            covered_points.append(pos)
+            new_antenna = make_circle(covered_points)
+            if((200+1*new_antenna[2]**2) > (200+1*closest_antenna[2]**2 + 200)):
+               new_antenna = (pos[0], pos[1], 1)
             else:
-                closest_antenna = min(child.antennas, key=lambda x : dist_squared(pos, (x[0],x[1])))
-                #les points couvert par l'antenne
-                covered_points = [p for p in positions if child.verify_cover(p, closest_antenna)]
-                covered_points.append(pos)
-                new_antenna = make_circle(covered_points)
-                if((200+1*new_antenna[2]**2) > (200+1*closest_antenna[2]**2 + 200)):
-                   new_antenna = (pos[0], pos[1], 1)
-                else:
-                    child.antennas = tuple([ant for ant in child.antennas if ant != closest_antenna])
-                child.add_antenna(new_antenna)
-            children.append(child)
+                child.antennas = tuple([ant for ant in child.antennas if ant != closest_antenna])
+            child.add_antenna(new_antenna)
+            child.remaining_positions = tuple([p for p in child.remaining_positions if p != pos])
+        children.append(child)
         return children
 
     def __eq__(self, other):
@@ -152,8 +154,10 @@ class State:
         return str(self.antennas)
 
 def main():
-    points = [(30, 0), (10, 10), (25,20),(20, 30), (30, 40), (40, 50), (30, 99)];
-    #points = [(30, 0), (10, 10), (25,20)];
+    #points = [(30, 0), (10, 10), (25,20),(20, 30), (30, 40), (40, 50), (30, 99)];
+    #points = [(30, 0), (10, 10), (20,20), (30, 40),(50,40)];
+    points = random_pos(20, 100)
+    print(points)
     fig=pyplot.figure(1)
     ax = fig.add_subplot(1,1,1)
     pyplot.scatter(*zip(*points))
@@ -161,6 +165,7 @@ def main():
     result = search(points, 200, 1)
     temp = time.clock() - before
     print("Temps: " + str(temp))
+    print("Cout: " + str(result.cost(200,1)))
     for antenna in result.antennas:
         circle = pyplot.Circle((antenna[0],antenna[1]), antenna[2], color='g', fill=False)
         ax.add_patch(circle)
@@ -172,6 +177,13 @@ def main():
 
 
     pyplot.show()
+
+def random_pos(numPos, max):
+    points = []
+    random.seed()
+    for _ in range(0, numPos):
+        points.append((random.randrange(0, max), random.randrange(0, max)))
+    return points
 
 if __name__ == "__main__":
     main()
