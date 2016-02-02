@@ -120,12 +120,14 @@ class State:
 
     def childs(self):
         children = []
-        child = State(self.antennas, self.remaining_positions)
         if not self.antennas:
-            pos = child.remaining_positions[0]
-            child.add_antenna((pos[0], pos[1], 1))
-            child.remaining_positions = tuple([p for p in child.remaining_positions if p != pos])
+            for pos in positions:
+                child = State(self.antennas, self.remaining_positions)
+                child.add_antenna((pos[0], pos[1], 1))
+                child.remaining_positions = tuple([p for p in child.remaining_positions if p != pos])
+                children.append(child)
         else:
+            child = State(self.antennas, self.remaining_positions)
             pos = min(self.remaining_positions, key=lambda p : dist_squared(p, self.antennas[-1]))
             closest_antenna = min(child.antennas, key=lambda x : dist_squared(pos, (x[0],x[1])))
             #les points couvert par l'antenne
@@ -138,7 +140,7 @@ class State:
                 child.antennas = tuple([ant for ant in child.antennas if ant != closest_antenna])
             child.add_antenna(new_antenna)
             child.remaining_positions = tuple([p for p in child.remaining_positions if p != pos])
-        children.append(child)
+            children.append(child)
         return children
 
     def __eq__(self, other):
@@ -160,7 +162,7 @@ def main():
     print(points)
     fig=pyplot.figure(1)
     ax = fig.add_subplot(1,1,1)
-    pyplot.scatter(*zip(*points))
+    pyplot.scatter(*zip(*points),marker='x' )
     before = time.clock()
     result = search(points, 200, 1)
     temp = time.clock() - before
@@ -186,6 +188,7 @@ def random_pos(numPos, max):
     return points
 
 if __name__ == "__main__":
-    main()
+    for _ in range(0, 10):
+        main()
 
 
