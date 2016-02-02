@@ -23,7 +23,6 @@
   <ItemGroup>
     <Compile Include="main.py" />
     <Compile Include="smallestenclosingcircle.py" />
-    <Compile Include="solution.py" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
