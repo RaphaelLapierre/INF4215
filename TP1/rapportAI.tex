@@ -44,7 +44,7 @@
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
 \lstset{frame=tb,
-   language=c++,
+   language=python,
    aboveskip=3mm,
    belowskip=3mm,
    showstringspaces=false,
@@ -57,7 +57,7 @@
    stringstyle=\color{mauve},
    breaklines=true,
    breakatwhitespace=true
-   tabsize=3
+   tabsize=4
 }
 \linespread{1.00} % Change line spacing here, Palatino benefits from a slight increase by default
 
@@ -91,7 +91,7 @@ Dans le cadre du cours
 \title{Travail pratique \#1} 
 
 \author{\textsc{Raphael Lapierre 1644671\\
-	        Alexandre St-Onge Matricule 728} % Author
+	        Alexandre St-Onge Matricule 1623576} % Author
 \vspace{10pt}
 \\{\textit{École Polytechnique de Montréal}}} % Institution
 
@@ -117,9 +117,31 @@ Dans le cadre du cours
 %----------------------------------------------------------------------------------------
 %	ESSAY BODY
 %----------------------------------------------------------------------------------------
-\section*{Question 1}
+\section*{Explication des algorithmes}
 
-\subsection*{Subsection 1}
+\subsection*{Recherche en arbre}
+La recherche en arbre commence avec l'état initial vide et \emph{n} enfants avec chacun 1 antenne qui couvre une position, où \emph{n} est le nombre de place à couvrir.
+Par la suite, l'enfant d'un état est calculé en trouvant le point non couvert le plus près de la dernière antenne placé et en couvrant ce dernier soit en ajoutant une nouvelle 
+antenne ou en aggrandissant la dernière antenne placé. L'algorithme de Djikstra est utilisé pour parcourir l'arbre d'état afin de trouver une solution.
+
+\subsection*{Recherche local}
+Notre algorithme de recherche local effectue un recuit simulé à partir d'une solution obtenue avec une algorithme vorace naïf. 
+
+\section*{Questions}
+
+\subsection*{Question 1}
+Expliquez ce que fait cette fonction et fournissez un exemple utilisant cette fonction.
+\begin{lstlisting}
+def fct(predList, inputList):
+	return filter(lambda x: all([f(x) for f in predList]), inputList)
+\end{lstlisting}
+
+La fonction filtre la liste \texttt{inputList} pour ne retourner que les éléments qui respectent tout les prédicats présents dans \texttt{predList}.
+Si \texttt{inputList} est une liste d'état, il serait donc possible d'utiliser cette fonction pour filtrer la liste afin d'obtenir seulement que les états 
+respectant tout nos prédicats.
+
+\subsection*{Question 2}
+Je dirais que les points fort de nos algorithmes sont leur belle énergie et le fait qu'ils peuvent être exécuté sur un ordinateur.
 
 %----------------------------------------------------------------------------------------
 \end{document}
