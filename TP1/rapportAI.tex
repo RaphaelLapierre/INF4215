@@ -124,8 +124,9 @@ La recherche en arbre commence avec l'état initial vide et \emph{n} enfants ave
 Par la suite, l'enfant d'un état est calculé en trouvant le point non couvert le plus près de la dernière antenne placé et en couvrant ce dernier soit en ajoutant une nouvelle 
 antenne ou en aggrandissant la dernière antenne placé. L'algorithme de Djikstra est utilisé pour parcourir l'arbre d'état afin de trouver une solution.
 
-\subsection*{Recherche local}
-Notre algorithme de recherche local effectue un recuit simulé à partir d'une solution obtenue avec une algorithme vorace naïf. 
+\subsection*{Recherche locale}
+Notre algorithme de recherche locale effectue un recuit simulé à partir d'une solution obtenue avec une algorithme vorace naïf. 
+Le recuit simulé fonctionne en échangeant des points entre les antennes.
 
 \section*{Questions}
 
@@ -141,7 +142,19 @@ Si \texttt{inputList} est une liste d'état, il serait donc possible d'utiliser 
 respectant tout nos prédicats.
 
 \subsection*{Question 2}
-Je dirais que les points fort de nos algorithmes sont leur belle énergie et le fait qu'ils peuvent être exécuté sur un ordinateur.
+\subsubsection*{Recherche en arbre}
+Le point fort de la recherche en arbre que nous avons implémentée est son bon compromis entre une solution
+acceptable et le temps de calcul. En effet, celui-ci ignore beaucoup d'états lorsqu'il ajoute les enfants à la frontière.
+Cela a pour effet de ne pas garantir une solution optimale mais au moins le résultat peut arriver rapidement.
+Le point faible de notre algorithme est par contre qu'il ne garanti justement pas une solution idéale. Cela dépend
+des applications mais il se peut que ce point soit inacceptable.
+
+\subsubsection*{Recherche locale}
+En utilisant la méthode du recuit simulé, nous pouvons nous échapper d'un minimum local ce qui peut être avantageux
+dans la recherche d'une bonne solution. Un des points faibles de notre implémentation est que notre solution de départ
+donnée par un algorithme vorace est très naïve ce qui peut donner du fil à retordre au recuit simulé pour converger.
+Finalement, les variables de température et de temps du recuit simulé ne sont pas tout à fait optimisées au problème.
 
 %----------------------------------------------------------------------------------------
 \end{document}
+

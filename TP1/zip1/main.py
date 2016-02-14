@@ -31,7 +31,7 @@ def search(Positions, k, c):
         frontier = frontier.union(current.childs())
         frontier.remove(current)
         
-    return current
+    return list(current.antennas)
 
 
 def dist_squared(pos1, pos2):
@@ -99,16 +99,14 @@ class State:
 def main():
     #points = [(30, 0), (10, 10), (25,20),(20, 30), (30, 40), (40, 50), (30, 99)];
     #points = [(30, 0), (10, 10), (20,20), (30, 40),(50,40)];
-    points = random_pos(20, 100)
+    points = random_pos(50, 100)
     fig=pyplot.figure(1)
     ax = fig.add_subplot(1,1,1)
     pyplot.scatter(*zip(*points),marker='x' )
     before = time.clock()
     result = search(points, 200, 1)
     temp = time.clock() - before
-    print("Temps: " + str(temp))
-    print("Cout: " + str(result.cost(K,C)))
-    for antenna in result.antennas:
+    for antenna in result:
         circle = pyplot.Circle((antenna[0],antenna[1]), antenna[2], color='g', fill=False)
         ax.add_patch(circle)
 
