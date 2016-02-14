@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2015.12.7)  14 FEB 2016 15:15
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2015.12.7)  14 FEB 2016 15:25
 entering extended mode
 **rapportAI.tex
 (rapportAI.tex
@@ -548,7 +548,7 @@ Package microtype Info: Loading generic settings for font family
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 145.
- [2]
+ [2] [3]
 (rapportAI.aux) ) 
 Here is how much of TeX's memory you used:
  6527 strings out of 493673
@@ -563,9 +563,9 @@ Here is how much of TeX's memory you used:
 Program Files (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Fil
 es (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files (x86)/Mi
 KTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on rapportAI.pdf (2 pages, 52274 bytes).
+Output written on rapportAI.pdf (3 pages, 54095 bytes).
 PDF statistics:
- 26 PDF objects out of 1000 (max. 8388607)
+ 29 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  26113 words of extra memory for PDF output out of 29859 (max. 10000000)
 
