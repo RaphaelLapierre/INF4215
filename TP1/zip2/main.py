@@ -8,7 +8,6 @@ from smallestenclosingcircle import make_circle
 
 def search(Positions, k, c):
     solution = greedy_solution(Positions, k, c)
-    print(str(cout(solution, k,c)))
     meilleur = solution
     T = 500.0
     theta = T
@@ -21,11 +20,9 @@ def search(Positions, k, c):
             voisin = find_neighbour(solution, Positions)
             delta = cout(solution, k, c) - cout(voisin, k, c)
             if CritereMetropolis(delta, theta):
-                print("Nouvelle solution: " + str(cout(voisin, k, c)))
                 solution = voisin
                 if cout(solution, k, c) < cout(meilleur, k , c):
                     meilleur = solution
-                    print("Nouveau meilleux: " + str(cout(meilleur, k, c)))
         theta *= alpha
 
 
@@ -107,7 +104,6 @@ def main():
     before = time.clock()
     result = search(points, 200, 1)
     temp = time.clock() - before
-    print("Temps: " + str(temp))
     for antenna in result:
         circle = pyplot.Circle((antenna[0],antenna[1]), antenna[2], color='g', fill=False)
         ax.add_patch(circle)
