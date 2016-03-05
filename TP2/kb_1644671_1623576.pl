@@ -15,12 +15,13 @@ coursPrealableComplete(Etudiant, [A|T]) :-
 coursPrealableComplete(Etudiant, [A|T]) :-
 	\+ prop(coursPrealable, A, Prealables),
 	coursPrealableComplete(Etudiant, T).
-	
+
+creditPrealableValide(Etudiant, []).	
 creditPrealableValide(Etudiant, [A|T]):-
 	coursComplete(Etudiant, Cours),
 	sommeCredit(Cours, Somme),
 	assezDeCredits(Somme, A),
-	creditPrealable(Etudiant, T).
+	creditPrealableValide(Etudiant, T).
 	
 assezDeCredits(Somme, Cours):-
 	prop(creditPrealable, Cours, Credit),
