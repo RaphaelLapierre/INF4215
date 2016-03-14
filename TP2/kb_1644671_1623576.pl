@@ -1,4 +1,8 @@
-
+isQualite(ChoixDeCours):-
+    sommeCredit(ChoixDeCours, Somme),
+    Somme =< 18,
+    Somme >= 12.
+    
 choixDeCoursValide(Etudiant,ChoixDeCours):-
 	forall(member(C, ChoixDeCours), cours(C)),
 	coursPrealableComplete(Etudiant,ChoixDeCours),
@@ -169,6 +173,89 @@ prop(corequis, inf2990, [log2420]).
 prop(corequis, log3000, [log3900]).
 prop(corequis, log3900, [log3000, log3005]).
 prop(corequis, log3005, [log3900]).
+
+sujet(informatique).
+%Sujet
+sousSujet(A,B) :- prop(sous_sujet, A, B).
+sousSujet(X, C2) :-
+    prop(sous_sujet,X, C1),
+    sousSujet(C1, C2).
+    
+prop(sous_sujet, algorithmie, informatique).
+prop(sous_sujet, qualite_logiciel, informatique).
+prop(sous_sujet, compilateur, informatique ).
+prop(sous_sujet, math_discrete, mathematique).
+prop(sous_sujet, algebre, mathematique ).
+prop(sous_sujet, calculus, mathematique).
+prop(sous_sujet, methode_numerique, mathematique).
+prop(sous_sujet, comptabilite, economie ).
+prop(sous_sujet, technologie, sociologie).
+prop(sous_sujet, loi, ethique).
+prop(sous_sujet, strucuture_donne, algorithmie).
+prop(sous_sujet, base_donne, algorithmie).
+prop(sous_sujet, test, qualite_logiciel).
+prop(sous_sujet, processus, qualite_lociel).
+prop(sous_sujet, conception, informatique).
+prop(sous_sujet, systeme_exploitation, informatique).
+prop(sous_sujet, uml, conception).
+prop(sous_sujet, patron, conception).
+prop(sous_sujet, design, conception).
+prop(sous_sujet, anti_patron, conception).
+prop(sous_sujet, interface, conception).
+prop(sous_sujet, langage, compilateur).
+prop(sous_sujet, architecture, conception).
+prop(sous_sujet, web, informatique).
+prop(sous_sujet, html, web).
+prop(sous_sujet, javascript, web).
+prop(sous_sujet, complexite, algorithmie).
+prop(sous_sujet, reseau, informatique).
+prop(sous_sujet, mecanique, physique).
+prop(sous_sujet, physique_multimedia, physique).
+prop(sous_sujet, strucuture_donne, qualite_lociel).
+
+aborde(C, S) :-
+    prop(aborde, C, S).
+
+aborde(C, S) :-
+    prop(aborde, C, S2),
+    sousSujet(S2, S).
+
+prop(aborde, inf1005c, algorithmie).
+prop(aborde, inf1500, system_numerique).
+prop(aborde, mth1101, calculus).
+prop(aborde, mth1006, algebre).
+prop(aborde, log3005i, communication).
+prop(aborde, inf1040, informatique).
+prop(aborde, inf1010, algorithmie).
+prop(aborde, log1000, informatique).
+prop(aborde, inf1600, micro_ordinateur).
+prop(aborde, mth1102, calculus).
+prop(aborde, inf1995, informatique).
+prop(aborde, inf2010, strucuture_donne).
+prop(aborde, log2420, interface).
+prop(aborde, log2810, math_discrete).
+prop(aborde, mth2302d, probabilite).
+prop(aborde, log2420, conception).
+prop(aborde, mth1210, methode_numerique).
+prop(aborde, inf2610, systeme_exploitation).
+prop(aborde, inf3710, base_donne).
+prop(aborde, inf2990, informatique).
+prop(aborde, ssh5100, sociologie).
+prop(aborde, inf3405, reseau).
+prop(aborde, phs1101, mecanique).
+prop(aborde, ssh5201, comptabilite).
+prop(aborde, log3430, test).
+prop(aborde, ssh5501, technologie).
+prop(aborde, inf4705, algorithmie).
+prop(aborde, log3210, langage).
+prop(aborde, log3000, processus).
+prop(aborde, log3900, informatique).
+prop(aborde, log3005, communication).
+prop(aborde, log4410, methode_formelles).
+prop(aborde, log4430, architecture).
+prop(aborde, phs4700, physique_multimedia).
+prop(aborde, log4900, informatique).
+prop(aborde, inf8301, qualite_lociel).
 
 %etudiant
 etudiant(alex).
