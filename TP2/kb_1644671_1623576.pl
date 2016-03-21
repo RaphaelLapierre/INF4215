@@ -10,6 +10,7 @@ choixDeCoursValide(Etudiant,ChoixDeCours):-
 	corequisValide(Etudiant, ChoixDeCours).
 	
 coursPrealableComplete(Etudiant, []).
+
 coursPrealableComplete(Etudiant, [A|T]) :-
 	prop(coursPrealable, A, Prealables),
 	coursComplete(Etudiant, I),
@@ -56,6 +57,69 @@ sommeCredit([H|T], Sum):-
 	prop(credits, H, C),
 	Sum is C + Rest.
 
+aborde(C, S) :-
+    prop(aborde, C, S).
+
+aborde(C, S) :-
+    prop(aborde, C, S2),
+    sousSujet(S2, S).
+
+utiliseLangage(C, L):-
+	prop(langage, C, L).
+
+programmeOffrantCours(P, C):-
+	prop(programme, C, P).
+
+coursClasseInverse(C):-
+	prop(inverse, C).
+
+coursObligatoire(C):-
+	prop(obligatoire, C).
+
+coursOptionel(C):-
+	prop(optionel, C).
+
+coursProjet(C):-
+	prop(projet, C).
+
+coursObligatoiresSuivi(E, []).
+coursObligatoiresSuivi(E, [H|T]):-
+	coursComplete(E, C),
+	member(H, C),
+	prop(obligatoire, H),
+	coursObligatoiresSuivi(E, T).
+
+coursOptionelsSuivi(E, []).
+coursOptionelsSuivi(E, [H|T]):-
+	coursComplete(E, C),
+	member(H, C),
+	prop(optionel, H),
+	coursOptionelsSuivi(E, T).
+
+coursProjetSuivi(E, []).
+coursProjetSuivi(E, [H|T]):-
+	coursComplete(E, C),
+	member(H, C),
+	prop(projet, H),
+	coursProjetSuivi(E, T).
+
+inscritOrientation(E, O):-
+	orientation(E, O).
+
+orientationThematique(O):-
+	prop(thematique, O).
+
+inscriptionEchange(E, []).
+inscriptionEchange(E, [H|T]):-
+	propEtudiant(echange, E),
+	prop(echange, H),
+	inscriptionEchange(E, T).
+
+equivalence(C, []).
+equivalence(C, [H|T]):-
+	aborde(C, H),
+	equivalence(C, T).
+
 % liste des cours
 cours(inf1005c).
 cours(inf1500).
@@ -93,6 +157,12 @@ cours(log4430).
 cours(phs4700).
 cours(log4900).
 cours(inf8301).
+cours(inf3500).
+cours(inf4215).
+cours(inf8702).
+cours(inf4710).
+cours(inf8601).
+cours(inf8225).
 
 %credits
 prop(credits, inf1005c, 3).
@@ -176,7 +246,8 @@ prop(corequis, log3005, [log3900]).
 
 sujet(informatique).
 %Sujet
-sousSujet(A,B) :- prop(sous_sujet, A, B).
+sousSujet(A,B) :- 
+    prop(sous_sujet, A, B).
 sousSujet(X, C2) :-
     prop(sous_sujet,X, C1),
     sousSujet(C1, C2).
@@ -213,12 +284,6 @@ prop(sous_sujet, mecanique, physique).
 prop(sous_sujet, physique_multimedia, physique).
 prop(sous_sujet, strucuture_donne, qualite_lociel).
 
-aborde(C, S) :-
-    prop(aborde, C, S).
-
-aborde(C, S) :-
-    prop(aborde, C, S2),
-    sousSujet(S2, S).
 
 prop(aborde, inf1005c, algorithmie).
 prop(aborde, inf1500, system_numerique).
@@ -256,11 +321,135 @@ prop(aborde, log4430, architecture).
 prop(aborde, phs4700, physique_multimedia).
 prop(aborde, log4900, informatique).
 prop(aborde, inf8301, qualite_lociel).
+prop(aborde, inf4215, algorithmie).
+prop(aborde, inf4215, ia).
 
 %etudiant
 etudiant(alex).
-coursComplete(alex, [inf1005c]).
+coursComplete(alex, [inf1005c, log1000, inf1500, inf2010, inf1995, log2995, inf4215, inf8601]).
+orientation(alex, multimedia).
 
+etudiant(raph).
+coursComplete(raph, [inf1005c, inf1500, inf2010, inf1995, log2995, inf4215, inf8601, mth1102, mth1101, mth1006]).
+orientation(raph, mathematique).
 
+%Langage de programmation
+prop(langage, inf1005c, cpp).
+prop(langage, inf1500, vhdl).
+prop(langage, inf1010, cpp).
+prop(langage, log1000, scala).
+prop(langage, inf1600, x86).
+prop(langage, inf1995, cpp).
+prop(langage, inf2010, java).
+prop(langage, log2810, cpp).
+prop(langage, mth1210, matlab).
+prop(langage, inf2610, systeme_exploitation).
+prop(langage, inf3710, sql).
+prop(langage, inf2990, cpp).
+prop(langage, inf3405, cpp).
+prop(langage, inf4705, cpp).
+prop(langage, phs4700, matlab).
 
+%Programmes
+prop(programme, inf1005c, informatique).
+prop(programme, inf1005c, logiciel).
+prop(programme, inf1500, informatique).
+prop(programme, inf1500, logiciel).
+prop(programme, mth1101, informatique).
+prop(programme, mth1006, informatique).
+prop(programme, log3005i, informatique).
+prop(programme, inf1040, informatique).
+prop(programme, inf1010, informatique).
+prop(programme, inf1010, logiciel).
+prop(programme, log1000, informatique).
+prop(programme, inf1600, informatique).
+prop(programme, inf1600, logiciel).
+prop(programme, mth1102, informatique).
+prop(programme, inf1995, informatique).
+prop(programme, inf1995, logiciel).
+prop(programme, inf2010, informatique).
+prop(programme, inf2010, logiciel).
+prop(programme, log2420, informatique).
+prop(programme, log2810, informatique).
+prop(programme, mth2302d, informatique).
+prop(programme, log2420, informatique).
+prop(programme, mth1210, informatique).
+prop(programme, inf2610, informatique).
+prop(programme, inf2610, logiciel).
+prop(programme, inf3710, informatique).
+prop(programme, inf2990, informatique).
+prop(programme, ssh5100, informatique).
+prop(programme, inf3405, informatique).
+prop(programme, phs1101, informatique).
+prop(programme, phs1101, physique).
+prop(programme, phs1101, logiciel).
+prop(programme, ssh5201, informatique).
+prop(programme, log3430, informatique).
+prop(programme, ssh5501, informatique).
+prop(programme, inf4705, informatique).
+prop(programme, log3210, logiciel).
+prop(programme, log3000, logiciel).
+prop(programme, log3900, logiciel).
+prop(programme, log3005, logiciel).
+prop(programme, log4410, logiciel).
+prop(programme, log4430, logiciel).
+prop(programme, phs4700, informatique).
+prop(programme, phs4700, logiciel).
+prop(programme, phs4700, physique).
+prop(programme, log4900, informatique).
+prop(programme, inf8301, informatique).
 
+%ClasseInverse
+prop(inverse, inf4215).
+prop(inverse, inf3500).
+
+%Obligatoire
+prop(obligatoire, inf1005c).
+prop(obligatoire, inf1010).
+prop(obligatoire, inf1500).
+prop(obligatoire, inf1600).
+prop(obligatoire, mth1101).
+prop(obligatoire, mth1006).
+prop(obligatoire, mth1102).
+prop(obligatoire, mth2302d).
+prop(obligatoire, phs1101).
+prop(obligatoire, ssh5100).
+prop(obligatoire, ssh5201).
+
+%Optionel
+prop(optionel, inf4215).
+prop(optionel, inf8702).
+prop(optionel, inf4710).
+prop(optionel, inf8601).
+prop(optionel, inf8225).
+
+%Projet
+prop(projet, inf1995).
+prop(projet, inf2995).
+prop(projet, inf3995).
+prop(projet, inf4995).
+prop(projet, log1995).
+prop(projet, log2995).
+prop(projet, log3995).
+prop(projet, log4995).
+
+%Thematique
+prop(thematique, developpementDurable).
+prop(thematique, innovationTechnologique).
+prop(thematique, mathematique).
+prop(thematique, outilsDeGestion).
+prop(thematique, projetInternationaux).
+
+%Echange
+propEtudiant(echange, brice).
+prop(echange, inf1005c).
+prop(echange, inf1010).
+prop(echange, inf1500).
+prop(echange, inf1600).
+prop(echange, mth1101).
+prop(echange, mth1006).
+prop(echange, mth1102).
+prop(echange, mth2302d).
+prop(echange, phs1101).
+prop(echange, ssh5100).
+prop(echange, ssh5201).
