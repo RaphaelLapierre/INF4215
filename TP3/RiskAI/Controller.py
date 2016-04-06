@@ -12,6 +12,8 @@ class Controller:
         self._nbStartingTroops = 40;
         self._players = [Player(firstPlayerName, self._nbStartingTroops), Player(secondPlayerName, self._nbStartingTroops)]
         self._ais = [firstPlayerAI, secondPlayerAI]
+        for ai in self._ais:
+            ai.setMap(self._map)
 
         self.CHOOSING_COUNTRY_STATE = 0
         self.PLACING_STARTING_TROOPS = 1
