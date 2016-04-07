@@ -18,3 +18,19 @@ def getCountryScore(map, country):
         if country in continent[2]:
             return continent[0] / len(continent[2])
     return -1
+
+
+def getDangerIndex(ownedCountry, playerName):
+    totalFriendlyTroops = 0
+    totalTroops = 0
+    for country in ownedCountry.getNeighbours():
+
+        if country.getOwner() is playerName:
+            totalFriendlyTroops += country.getNbTroops()
+
+        totalTroops += country.getNbTroops();
+
+    totalFriendlyTroops += ownedCountry.getNbTroops()
+    totalTroops += ownedCountry.getNbTroops()
+
+    return totalFriendlyTroops / totalTroops

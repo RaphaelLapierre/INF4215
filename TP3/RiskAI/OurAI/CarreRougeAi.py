@@ -1,9 +1,7 @@
-from AI import AI
-from AttackAction import AttackAction
-from MoveAction import MoveAction
-from PlaceTroopsAction import PlaceTroopsAction
-
-from MapScore import *
+from RiskAI.AI import AI
+from RiskAI.OurAI.ChooseStartingCountryStrategy import LearningStartingCountryStrategy
+from RiskAI.OurAI.PlaceStartingTroopsStrategy import PlaceStartingTroopsStrategy
+from RiskAI import PlaceTroopsAction
 
 __author__ = 'GND'
 
@@ -11,7 +9,10 @@ __author__ = 'GND'
 class CarreRougeAI(AI):
 
     def __init__(self):
-        pass
+        self._startingCountryStrategy = LearningStartingCountryStrategy()
+        self._placeStartingTroopsStrategy = PlaceStartingTroopsStrategy()
+        self._name = None
+
 
     # Choose a starting country one at the time
     #
@@ -21,8 +22,9 @@ class CarreRougeAI(AI):
     #
     # return : one element of the remainingCountries list
     def chooseStartingCountry(self, remainingCountries, ownedCountries, allCountries):
-        selectedCountry = max(remainingCountries, key=lambda x: getCountryScore(self._map, x))
-        return selectedCountry
+        if(ownedCountries and not self._name):
+            self._name = ownedCountries[0].getOwner()
+        return self._startingCountryStrategy.chooseStartingCountry(remainingCountries, allCountries)
 
     # Place troops before the games begins. You can place only a portion of the available
     # troops. This method will be called again if you still have troops to be placed
@@ -33,7 +35,14 @@ class CarreRougeAI(AI):
     #
     # return : a list of PlaceTroopsAction
     def placeStartingTroops(self, nbTroopsToPlace, ownedCountries, allCountries):
-        pass
+        #on commence par mettre 1 armé sur chaque pays
+        placeTroopAction = []
+        if all(c.getNbTroops() == 0 for c in ownedCountries):
+            placeTroopAction = [PlaceTroopsAction(c, 1) for c in ownedCountries]
+        else:
+            placeTroopAction = self._placeStartingTroopsStrategy.placeStartingTroopCountry(nbTroopsToPlace, ownedCountries, allCountries)
+
+        return placeTroopAction
 
     # Declare attacks on the other countries. You need to check if the defending country is
     # not yours, or your attack declaration will be ignored

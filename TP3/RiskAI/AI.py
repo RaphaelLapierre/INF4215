@@ -8,9 +8,6 @@ class AI:
     def __init__(self):
         pass
 
-    def setMap(self, map):
-        self._map = map
-
     # Choose a starting country one at the time
     #
     # remainingCountries : the countries that are not chosen yet
