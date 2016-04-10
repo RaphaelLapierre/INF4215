@@ -1,7 +1,9 @@
+# coding=utf-8
 from RiskAI.AI import AI
-from RiskAI.OurAI.ChooseStartingCountryStrategy import LearningStartingCountryStrategy
-from RiskAI.OurAI.PlaceStartingTroopsStrategy import PlaceStartingTroopsStrategy
-from RiskAI import PlaceTroopsAction
+from RiskAI.OurAI.AttackAgent import AttackAgent
+from RiskAI.OurAI.ChooseStartingCountryAgent import ChooseStartingCountryAgent
+from RiskAI.OurAI.PlaceStartingTroopsAgent import PlaceStartingTroopsAgent
+from RiskAI.PlaceTroopsAction import PlaceTroopsAction
 
 __author__ = 'GND'
 
@@ -9,9 +11,11 @@ __author__ = 'GND'
 class CarreRougeAI(AI):
 
     def __init__(self):
-        self._startingCountryStrategy = LearningStartingCountryStrategy()
-        self._placeStartingTroopsStrategy = PlaceStartingTroopsStrategy()
-        self._name = None
+        self._startingCountryAgent = ChooseStartingCountryAgent(gamma=1)
+        self.saveLastStartCountry = True
+        self.saveLastPlaceStartingTroop = True
+        self._placeStartingTroopsAgent = PlaceStartingTroopsAgent(gamma=1)
+        self.attackAgent = AttackAgent(gamma=1)
 
 
     # Choose a starting country one at the time
@@ -22,9 +26,7 @@ class CarreRougeAI(AI):
     #
     # return : one element of the remainingCountries list
     def chooseStartingCountry(self, remainingCountries, ownedCountries, allCountries):
-        if(ownedCountries and not self._name):
-            self._name = ownedCountries[0].getOwner()
-        return self._startingCountryStrategy.chooseStartingCountry(remainingCountries, allCountries)
+        return self._startingCountryAgent.chooseStartingCountry(remainingCountries, ownedCountries.values(), allCountries)
 
     # Place troops before the games begins. You can place only a portion of the available
     # troops. This method will be called again if you still have troops to be placed
@@ -35,12 +37,18 @@ class CarreRougeAI(AI):
     #
     # return : a list of PlaceTroopsAction
     def placeStartingTroops(self, nbTroopsToPlace, ownedCountries, allCountries):
+        #On a besoin de l'etat final pour le QLearning du ChooseStartingCountryAgent
+        if(self.saveLastStartCountry):
+            oc = map(lambda x : x.getName(), ownedCountries.values())
+            self._startingCountryAgent.appendLastIteration(([], oc))
+            self.saveLastStartCountry = False
+
         #on commence par mettre 1 armé sur chaque pays
         placeTroopAction = []
-        if all(c.getNbTroops() == 0 for c in ownedCountries):
-            placeTroopAction = [PlaceTroopsAction(c, 1) for c in ownedCountries]
+        if all(c.getNbTroops() == 0 for c in ownedCountries.values()):
+            placeTroopAction = [PlaceTroopsAction(c.getName(), 1) for c in ownedCountries.values()]
         else:
-            placeTroopAction = self._placeStartingTroopsStrategy.placeStartingTroopCountry(nbTroopsToPlace, ownedCountries, allCountries)
+            placeTroopAction = self._placeStartingTroopsAgent.placeStartingTroopCountry(nbTroopsToPlace, ownedCountries.values(), allCountries)
 
         return placeTroopAction
 
@@ -52,7 +60,7 @@ class CarreRougeAI(AI):
     #
     # return : a list of AttackAction.
     def declareAttacks(self, ownedCountries, allCountries):
-        pass
+        return self.attackAgent.declareAttack(ownedCountries.values(), allCountries)
 
     # Place troops at the start of your turn. You need to place all available troops at one
     #
@@ -62,7 +70,16 @@ class CarreRougeAI(AI):
     #
     # return : a list of PlaceTroopsAction
     def placeTroops(self, nbTroopsToPlace, ownedCountries, allCountries):
-       pass
+        #Méthode appelé juste après la phase de départ
+        #On va donc passé l'état de départ au PlaceStartingTroopsAgent
+        #Pour son QLearning
+        if self.saveLastPlaceStartingTroop:
+            state = self._placeStartingTroopsAgent.getCurrentState(ownedCountries.values())
+            self._placeStartingTroopsAgent.appendLastIteration(state)
+            self.saveLastPlaceStartingTroop = False
+
+        placeTroopAction = [self._placeStartingTroopsAgent.placeStartingTroopCountry(1, ownedCountries.values(), allCountries)[0] for x in range(0,nbTroopsToPlace)]
+        return placeTroopAction
 
     # Move troops after attacking. You can only move one per turn
     #
@@ -85,7 +102,7 @@ class CarreRougeAI(AI):
     #
     # default behaviour : always choose 3
     def decideNbAttackingDice(self, attackResult, ownedCountries, allCountries):
-        pass
+        return 3
 
     # Decide the amount of defending dice while defending
     #
@@ -97,7 +114,7 @@ class CarreRougeAI(AI):
     #
     # default behaviour : always choose 2
     def decideNbDefendingDice(self, attackResult, ownedCountries, allCountries):
-        pass
+        return 2
 
     # Decide the amount of troops to be transfered to the new country after winning a battle
     #
@@ -111,7 +128,7 @@ class CarreRougeAI(AI):
     #
     # default behaviour : move half of the troops to the new country
     def decideNbTransferingTroops(self, attackResult, startCountry, endCountry, ownedCountries, allCountries):
-        pass
+        return startCountry.getNbTroops() / 2
 
     # Called when your AI wins an attack
     #
@@ -123,7 +140,7 @@ class CarreRougeAI(AI):
     #
     # default behaviour : do nothing
     def onAttackWon(self, attackResult, ownedCountries, allCountries):
-        pass
+        self.attackAgent.onAttackResult(1, ownedCountries)
 
     # Called when your AI loses an attack. AKA the attack finished because you only have 1 troop left in
     # the attacking country
@@ -136,7 +153,7 @@ class CarreRougeAI(AI):
     #
     # default behaviour : do nothing
     def onAttackLost(self, attackResult, ownedCountries, allCountries):
-        pass
+        self.attackAgent.onAttackResult(-1, ownedCountries)
 
     # Called when your AI succeeds to defend a territory.
     #
@@ -170,7 +187,8 @@ class CarreRougeAI(AI):
     #
     # default behaviour : do nothing
     def onGameWon(self, allCountries):
-        pass
+        self._startingCountryAgent.onGameWon()
+        self._placeStartingTroopsAgent.onGameWon()
 
     # Called when your AI lost the game
     #
@@ -180,5 +198,6 @@ class CarreRougeAI(AI):
     #
     # default behaviour : do nothing
     def onGameLost(self, allCountries):
-        pass
+        self._startingCountryAgent.onGameLost()
+        self._placeStartingTroopsAgent.onGameLost()
 

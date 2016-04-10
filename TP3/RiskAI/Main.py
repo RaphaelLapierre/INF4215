@@ -1,9 +1,10 @@
 from Controller import *
 from AI import *
 from RandomAI import *
+from OurAI.CarreRougeAi import CarreRougeAI
 
 ai1 = AI() # agent adverse sans apprentissage machine
-ai2 = RandomAI() # agent adverse aleatoire
+ai2 = CarreRougeAI() # agent adverse aleatoire
 
 nbWinAI2 = 0
 for i in xrange(100):
