@@ -13,6 +13,7 @@ class AttackAgent(Agent):
         self.gamma = gamma
         self.lastState = None
         self.lastAction = None
+        self.lastScore = 0
 
     def load(self):
         if path.isfile(self._fileName):
@@ -22,7 +23,7 @@ class AttackAgent(Agent):
         pickle.dump((self.nbQ, self.q, self.alpha), open(self._fileName, 'wb'))
 
     def declareAttack(self, ownedCountries, allCountries):
-        currentState = self.getState(ownedCountries)
+        currentState = self.getCurrentState(ownedCountries)
 
         #on s'interesse seulement au nombre de troop dans les pays qui peuvent
         #s'attaquer
@@ -42,14 +43,13 @@ class AttackAgent(Agent):
                 attackActionList.append(AttackAction(currentState[attackIndex][0], currentState[attackIndex][1], 3))
             attackIndex += 1
 
-
         self.lastState = currentStateQ
         self.lastAction = currentAction
-
+        self.lastScore = self.getScore(ownedCountries)
         return attackActionList
 
     def onAttackResult(self, reward, ownedCountries):
-        newState = tuple([zone[0].getNbTroops() - zone[1].getNbTroops() for zone in self.getState(ownedCountries.values())])
+        newState = tuple([zone[0].getNbTroops() - zone[1].getNbTroops() for zone in self.getCurrentState(ownedCountries.values())])
 
         self.setQ(self.lastState, self.lastAction, self.QValue(self.lastState, self.lastAction) +
                       self.alphaValue(self.lastState, self.lastAction) *
@@ -59,10 +59,36 @@ class AttackAgent(Agent):
        # self.save()
         pass
 
-    def getState(self, ownedCountries):
+    def getCurrentState(self, ownedCountries):
         zoneDeGuerre = []
         for country in ownedCountries:
             for voisin in country.getNeighbours():
                 if voisin.getOwner() is not country.getOwner():
                     zoneDeGuerre.append((country, voisin))
         return zoneDeGuerre
+
+    def getScore(self, ownedCountries):
+        return len(ownedCountries)
+
+    def feedback(self, ownedCountries):
+        if not self.lastAction and not self.lastState:
+            pass
+
+        newScore = self.getScore(ownedCountries)
+        if newScore > self.lastScore:
+            reward = 1
+        elif newScore == self.lastScore:
+            reward = 0
+        else:
+            reward = -1
+
+        newState = tuple([zone[0].getNbTroops() - zone[1].getNbTroops() for zone in self.getCurrentState(ownedCountries.values())])
+        self.setQs(reward, self.lastState, self.lastAction, newState)
+        self.lastAction = None
+        self.lastState = None
+
+    def setQs(self, reward, state, action, newState):
+
+        self.setQ(self.lastState, self.lastAction, self.QValue(self.lastState, self.lastAction) +
+                      self.alphaValue(self.lastState, self.lastAction) *
+                      (reward + self.gamma * self.getMaxQValue(newState, range(0, len(newState))) - self.QValue(self.lastState, self.lastAction)))

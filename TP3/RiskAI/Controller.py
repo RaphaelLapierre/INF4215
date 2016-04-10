@@ -30,6 +30,8 @@ class Controller:
 
         self._winner = None
 
+        self.learningAI = secondPlayerAI
+
     def play(self):
         while (self._gameState != self.END_STATE):
             self._print()
@@ -123,6 +125,8 @@ class Controller:
                 self._gameState = self.END_STATE
 
         self._turn = 1 - self._turn
+        if ai is not self.learningAI and self._gameState == self.PLAY_STATE:
+            self.learningAI.feedback(self._players[self._turn]._ownedCountries)
 
     def _print(self):
         print "TURN", self._step

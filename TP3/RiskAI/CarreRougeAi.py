@@ -1,6 +1,8 @@
 # coding=utf-8
 from AI import AI
 from AttackAgent import AttackAgent
+from FortifyingAgent import FortifyingAgent
+from PlaceTroopsAgent import PlaceTroopsAgent
 from ChooseStartingCountryAgent import ChooseStartingCountryAgent
 from PlaceStartingTroopsAgent import PlaceStartingTroopsAgent
 from PlaceTroopsAction import PlaceTroopsAction
@@ -16,7 +18,13 @@ class CarreRougeAI(AI):
         self.saveLastPlaceStartingTroop = True
         self._placeStartingTroopsAgent = PlaceStartingTroopsAgent(gamma=1)
         self.attackAgent = AttackAgent(gamma=1)
+        self.fortifyingAgent = FortifyingAgent(gamma=1)
+        self._placeTroopsAgent = PlaceTroopsAgent(gamma=1)
 
+    def feedback(self, ownedCountries):
+        self._placeTroopsAgent.feedback(ownedCountries)
+        self.attackAgent.feedback(ownedCountries)
+        self.fortifyingAgent.feedback(ownedCountries)
 
     # Choose a starting country one at the time
     #
@@ -48,7 +56,7 @@ class CarreRougeAI(AI):
         if all(c.getNbTroops() == 0 for c in ownedCountries.values()):
             placeTroopAction = [PlaceTroopsAction(c.getName(), 1) for c in ownedCountries.values()]
         else:
-            placeTroopAction = self._placeStartingTroopsAgent.placeStartingTroopCountry(nbTroopsToPlace, ownedCountries.values(), allCountries)
+            placeTroopAction = self._placeStartingTroopsAgent.placeStartingTroop(nbTroopsToPlace, ownedCountries.values(), allCountries)
 
         return placeTroopAction
 
@@ -78,7 +86,8 @@ class CarreRougeAI(AI):
             self._placeStartingTroopsAgent.appendLastIteration(state)
             self.saveLastPlaceStartingTroop = False
 
-        placeTroopAction = [self._placeStartingTroopsAgent.placeStartingTroopCountry(1, ownedCountries.values(), allCountries)[0] for x in range(0,nbTroopsToPlace)]
+
+        placeTroopAction = self._placeTroopsAgent.placeTroops(nbTroopsToPlace, ownedCountries.values(), allCountries)
         return placeTroopAction
 
     # Move troops after attacking. You can only move one per turn
@@ -89,7 +98,7 @@ class CarreRougeAI(AI):
     #
     # return : a lsingle MoveTroopAction
     def moveTroops(self, turnAttackResults, ownedCountries, allCountries):
-        pass
+        return self.fortifyingAgent.moveTroop(turnAttackResults, ownedCountries, allCountries)
 
 
     # Decide the amount of attacking dice while attacking
@@ -140,7 +149,7 @@ class CarreRougeAI(AI):
     #
     # default behaviour : do nothing
     def onAttackWon(self, attackResult, ownedCountries, allCountries):
-        self.attackAgent.onAttackResult(1, ownedCountries)
+        pass
 
     # Called when your AI loses an attack. AKA the attack finished because you only have 1 troop left in
     # the attacking country
@@ -153,7 +162,7 @@ class CarreRougeAI(AI):
     #
     # default behaviour : do nothing
     def onAttackLost(self, attackResult, ownedCountries, allCountries):
-        self.attackAgent.onAttackResult(-1, ownedCountries)
+        pass
 
     # Called when your AI succeeds to defend a territory.
     #
@@ -207,3 +216,4 @@ class CarreRougeAI(AI):
         self._startingCountryAgent.save()
         self._placeStartingTroopsAgent.save()
         self.attackAgent.save()
+        self.fortifyingAgent.save()

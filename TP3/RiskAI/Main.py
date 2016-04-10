@@ -15,7 +15,7 @@ ai1 = RandomAI() # agent adverse sans apprentissage machine
 ai2 = CarreRougeAI() # agent adverse aleatoire
 
 nbWinAI2 = 0
-for i in xrange(10000000):
+for i in xrange(100):
     if finish:
         break
     controller = Controller("Americas", "Normal", "Random", ai1, ai2)

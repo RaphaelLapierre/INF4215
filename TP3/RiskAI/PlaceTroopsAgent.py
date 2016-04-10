@@ -5,15 +5,16 @@ from Glie import glie
 from Agent import Agent
 from PlaceTroopsAction import PlaceTroopsAction
 
-class PlaceStartingTroopsAgent(Agent):
+class PlaceTroopsAgent(Agent):
 
     def __init__(self, gamma):
         Agent.__init__(self)
-        self._fileName = "placeStartingTroops.pickle"
+        self._fileName = "placeTroops.pickle"
         self.load()
         self.gamma = gamma
         self.lastState = None
         self.lastAction = None
+        self.lastScore = 0
         self.stateActionList = []
 
     def load(self):
@@ -28,10 +29,8 @@ class PlaceStartingTroopsAgent(Agent):
         self.lastState = None
         self.lastAction = None
 
-    def placeStartingTroop(self, nbTroopsToPlace, ownedCountries, allCountries):
+    def placeTroops(self, nbTroopsToPlace, ownedCountries, allCountries):
         currentState = self.getCurrentState(ownedCountries)
-        if(self.lastState and self.lastAction):
-            self.appendLastIteration(currentState)
 
         #action possible: ajouter 1 armée sur un pay
         possibleActions = range(0, len(ownedCountries))
@@ -39,11 +38,12 @@ class PlaceStartingTroopsAgent(Agent):
         currentAction = glie(self, currentState, 1.1, 10, possibleActions)
         self.lastState = currentState
         self.lastAction = currentAction
+        self.lastScore = self.getScore(ownedCountries)
 
         chosenCountry = currentState[currentAction][0]
 
         placeTroopAction = []
-        placeTroopAction.append(PlaceTroopsAction(chosenCountry, 1))
+        placeTroopAction.append(PlaceTroopsAction(chosenCountry, nbTroopsToPlace))
         return placeTroopAction
 
     def getCurrentState(self, ownedCountries):
@@ -58,16 +58,26 @@ class PlaceStartingTroopsAgent(Agent):
                 inDanger = country.getNbTroops() > ownedCountry.getNbTroops()
         return inDanger
 
+    def getScore(self, ownedCountries):
+        return len(ownedCountries)
 
-    def onGameWon(self):
-        self.setQs(1)
+    def feedback(self, ownedCountries):
+        if not self.lastAction and not self.lastState:
+            pass
 
-    def onGameLost(self):
-        self.setQs(-1)
+        newScore = self.getScore(ownedCountries)
+        if newScore > self.lastScore:
+            reward = 1
+        elif newScore == self.lastScore:
+            reward = 0
+        else:
+            reward = -1
 
-    def setQs(self, reward):
-        for state, action, newState in self.stateActionList:
-            self.setQ(state, action, self.QValue(state, action) +
+        self.setQs(reward, self.lastState, self.lastAction, self.getCurrentState(ownedCountries.values()))
+        self.lastAction = None
+        self.lastState = None
+
+    def setQs(self, reward, state, action, newState):
+        self.setQ(state, action, self.QValue(state, action) +
                       self.alphaValue(state, action) *
                       (reward + self.gamma * self.getMaxQValue(newState, range(0, len(newState))) - self.QValue(state, action)))
-        self.stateActionList = []
