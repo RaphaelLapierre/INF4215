@@ -1,7 +1,6 @@
 from Controller import *
-from AI import *
 from RandomAI import *
-from OurAI.CarreRougeAi import CarreRougeAI
+from RiskAI.CarreRougeAi import CarreRougeAI
 
 ai1 = AI() # agent adverse sans apprentissage machine
 ai2 = CarreRougeAI() # agent adverse aleatoire

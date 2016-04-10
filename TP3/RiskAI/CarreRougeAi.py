@@ -1,8 +1,8 @@
 # coding=utf-8
 from RiskAI.AI import AI
-from RiskAI.OurAI.AttackAgent import AttackAgent
-from RiskAI.OurAI.ChooseStartingCountryAgent import ChooseStartingCountryAgent
-from RiskAI.OurAI.PlaceStartingTroopsAgent import PlaceStartingTroopsAgent
+from RiskAI.AttackAgent import AttackAgent
+from RiskAI.ChooseStartingCountryAgent import ChooseStartingCountryAgent
+from RiskAI.PlaceStartingTroopsAgent import PlaceStartingTroopsAgent
 from RiskAI.PlaceTroopsAction import PlaceTroopsAction
 
 __author__ = 'GND'
