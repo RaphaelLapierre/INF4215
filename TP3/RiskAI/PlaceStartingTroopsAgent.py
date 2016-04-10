@@ -25,6 +25,8 @@ class PlaceStartingTroopsAgent(Agent):
 
     def appendLastIteration(self, newState):
         self.stateActionList.append((self.lastState, self.lastAction, newState))
+        self.lastState = None
+        self.lastAction = None
 
     def placeStartingTroopCountry(self, nbTroopsToPlace, ownedCountries, allCountries):
         currentState = self.getCurrentState(ownedCountries)

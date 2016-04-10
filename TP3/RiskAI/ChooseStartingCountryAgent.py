@@ -25,6 +25,8 @@ class ChooseStartingCountryAgent(Agent):
 
     def appendLastIteration(self, newState):
         self.stateActionList.append((self.lastState, self.lastAction, newState))
+        self.lastState = None
+        self.lastAction = None
 
     def chooseStartingCountry(self, remainingCountry, ownedCountries, allCountries):
         rem = ([r.getName() for r in remainingCountry])
