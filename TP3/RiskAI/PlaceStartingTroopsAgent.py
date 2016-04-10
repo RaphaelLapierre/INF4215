@@ -74,4 +74,4 @@ class PlaceStartingTroopsAgent(Agent):
             self.setQ(state, action, self.QValue(state, action) +
                       self.alphaValue(state, action) *
                       (reward + self.gamma * self.getMaxQValue(newState, range(0, len(newState))) - self.QValue(state, action)))
-        #self.save()
+        self.stateActionList = []

@@ -53,4 +53,4 @@ class ChooseStartingCountryAgent(Agent):
             self.setQ(state, action, self.QValue(state, action) +
                       self.alphaValue(state, action) *
                       (reward + self.gamma * self.getMaxQValue(newState, newState[0]) - self.QValue(state, action)))
-        #self.save()
+        self.stateActionList = []
