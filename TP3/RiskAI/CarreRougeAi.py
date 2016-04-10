@@ -1,9 +1,9 @@
 # coding=utf-8
-from RiskAI.AI import AI
-from RiskAI.AttackAgent import AttackAgent
-from RiskAI.ChooseStartingCountryAgent import ChooseStartingCountryAgent
-from RiskAI.PlaceStartingTroopsAgent import PlaceStartingTroopsAgent
-from RiskAI.PlaceTroopsAction import PlaceTroopsAction
+from AI import AI
+from AttackAgent import AttackAgent
+from ChooseStartingCountryAgent import ChooseStartingCountryAgent
+from PlaceStartingTroopsAgent import PlaceStartingTroopsAgent
+from PlaceTroopsAction import PlaceTroopsAction
 
 __author__ = 'GND'
 
@@ -189,6 +189,7 @@ class CarreRougeAI(AI):
     def onGameWon(self, allCountries):
         self._startingCountryAgent.onGameWon()
         self._placeStartingTroopsAgent.onGameWon()
+        self.attackAgent.onGameEnded()
 
     # Called when your AI lost the game
     #
@@ -200,4 +201,9 @@ class CarreRougeAI(AI):
     def onGameLost(self, allCountries):
         self._startingCountryAgent.onGameLost()
         self._placeStartingTroopsAgent.onGameLost()
+        self.attackAgent.onGameEnded()
 
+    def save(self):
+        self._startingCountryAgent.save()
+        self._placeStartingTroopsAgent.save()
+        self.attackAgent.save()

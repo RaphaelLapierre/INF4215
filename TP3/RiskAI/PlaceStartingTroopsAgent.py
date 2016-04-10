@@ -3,13 +3,13 @@ from os import path
 import pickle
 from Glie import glie
 from Agent import Agent
-from RiskAI.PlaceTroopsAction import PlaceTroopsAction
+from PlaceTroopsAction import PlaceTroopsAction
 
 class PlaceStartingTroopsAgent(Agent):
 
     def __init__(self, gamma):
         Agent.__init__(self)
-        self._fileName = "placeStartingTroops"
+        self._fileName = "placeStartingTroops.pickle"
         self.load()
         self.gamma = gamma
         self.lastState = None
@@ -72,4 +72,4 @@ class PlaceStartingTroopsAgent(Agent):
             self.setQ(state, action, self.QValue(state, action) +
                       self.alphaValue(state, action) *
                       (reward + self.gamma * self.getMaxQValue(newState, range(0, len(newState))) - self.QValue(state, action)))
-        self.save()
+        #self.save()

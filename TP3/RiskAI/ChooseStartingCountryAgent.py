@@ -9,7 +9,7 @@ from Glie import glie
 class ChooseStartingCountryAgent(Agent):
     def __init__(self, gamma):
         Agent.__init__(self)
-        self._fileName = "learningStartingCountry"
+        self._fileName = "startingCountry.pickle"
         self.gamma = gamma
         self.load()
         self.lastState = None
@@ -51,4 +51,4 @@ class ChooseStartingCountryAgent(Agent):
             self.setQ(state, action, self.QValue(state, action) +
                       self.alphaValue(state, action) *
                       (reward + self.gamma * self.getMaxQValue(newState, newState[0]) - self.QValue(state, action)))
-        self.save()
+        #self.save()

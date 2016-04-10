@@ -3,12 +3,12 @@ from os import path
 import pickle
 from Glie import glie
 from Agent import Agent
-from RiskAI.AttackAction import AttackAction
+from AttackAction import AttackAction
 
 class AttackAgent(Agent):
     def __init__(self, gamma):
         Agent.__init__(self)
-        self._fileName = "attackQ"
+        self._fileName = "attackQ.pickle"
         self.load()
         self.gamma = gamma
         self.lastState = None
@@ -56,7 +56,8 @@ class AttackAgent(Agent):
                       (reward + self.gamma * self.getMaxQValue(newState, range(0, len(newState))) - self.QValue(self.lastState, self.lastAction)))
 
     def onGameEnded(self):
-        self.save()
+       # self.save()
+        pass
 
     def getState(self, ownedCountries):
         zoneDeGuerre = []
