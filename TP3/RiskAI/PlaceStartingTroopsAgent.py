@@ -7,9 +7,9 @@ from PlaceTroopsAction import PlaceTroopsAction
 
 class PlaceStartingTroopsAgent(Agent):
 
-    def __init__(self, gamma):
+    def __init__(self, gamma, filename):
         Agent.__init__(self)
-        self._fileName = "placeStartingTroops.pickle"
+        self._fileName = filename + "placeStartingTroops.pickle"
         self.load()
         self.gamma = gamma
         self.lastState = None
@@ -36,7 +36,7 @@ class PlaceStartingTroopsAgent(Agent):
         #action possible: ajouter 1 armée sur un pay
         possibleActions = range(0, len(ownedCountries))
 
-        currentAction = glie(self, currentState, 1.1, 10, possibleActions)
+        currentAction = glie(self, currentState, 1.1, 100, possibleActions)
         self.lastState = currentState
         self.lastAction = currentAction
 
@@ -54,7 +54,7 @@ class PlaceStartingTroopsAgent(Agent):
     def isInDanger(self, ownedCountry):
         inDanger = False
         for country in ownedCountry.getNeighbours():
-            if country.getOwner is not ownedCountry.getOwner():
+            if country.getOwner() != ownedCountry.getOwner():
                 inDanger = country.getNbTroops() > ownedCountry.getNbTroops()
         return inDanger
 

@@ -7,9 +7,9 @@ from PlaceTroopsAction import PlaceTroopsAction
 
 class PlaceTroopsAgent(Agent):
 
-    def __init__(self, gamma):
+    def __init__(self, gamma, filename):
         Agent.__init__(self)
-        self._fileName = "placeTroops.pickle"
+        self._fileName = filename + "placeTroops.pickle"
         self.load()
         self.gamma = gamma
         self.lastState = None
@@ -35,7 +35,7 @@ class PlaceTroopsAgent(Agent):
         #action possible: ajouter 1 armée sur un pay
         possibleActions = range(0, len(ownedCountries))
 
-        currentAction = glie(self, currentState, 1.1, 10, possibleActions)
+        currentAction = glie(self, currentState, 1.1, 100, possibleActions)
         self.lastState = currentState
         self.lastAction = currentAction
         self.lastScore = self.getScore(ownedCountries)
@@ -54,18 +54,25 @@ class PlaceTroopsAgent(Agent):
     def isInDanger(self, ownedCountry):
         inDanger = False
         for country in ownedCountry.getNeighbours():
-            if country.getOwner is not ownedCountry.getOwner():
-                inDanger = country.getNbTroops() > ownedCountry.getNbTroops()
+            if country.getOwner() != ownedCountry.getOwner():
+                inDanger = country.getNbTroops() >= ownedCountry.getNbTroops()
         return inDanger
 
     def getScore(self, ownedCountries):
-        return len(ownedCountries)
+        score = 0
+        for country in ownedCountries:
+            score += country.getNbTroops()
+            for voisin in country.getNeighbours():
+                if country.getOwner() != voisin.getOwner():
+                    score -= voisin.getNbTroops()
+        return score
+
 
     def feedback(self, ownedCountries):
         if not self.lastAction and not self.lastState:
             pass
 
-        newScore = self.getScore(ownedCountries)
+        newScore = self.getScore(ownedCountries.values())
         if newScore > self.lastScore:
             reward = 1
         elif newScore == self.lastScore:

@@ -12,18 +12,18 @@ __author__ = 'GND'
 
 class CarreRougeAI(AI):
 
-    def __init__(self):
-        self._startingCountryAgent = ChooseStartingCountryAgent(gamma=1)
+    def __init__(self, gamma, filename):
+        self._startingCountryAgent = ChooseStartingCountryAgent(gamma, filename)
         self.saveLastStartCountry = True
         self.saveLastPlaceStartingTroop = True
-        self._placeStartingTroopsAgent = PlaceStartingTroopsAgent(gamma=1)
-        self.attackAgent = AttackAgent(gamma=1)
-        self.fortifyingAgent = FortifyingAgent(gamma=1)
-        self._placeTroopsAgent = PlaceTroopsAgent(gamma=1)
+        self._placeStartingTroopsAgent = PlaceStartingTroopsAgent(gamma, filename)
+        self.attackAgent = AttackAgent(gamma, filename)
+        self.fortifyingAgent = FortifyingAgent(gamma, filename)
+        self._placeTroopsAgent = PlaceTroopsAgent(gamma, filename)
 
-    def feedback(self, ownedCountries):
+    def feedback(self, ownedCountries, allCountries):
         self._placeTroopsAgent.feedback(ownedCountries)
-        self.attackAgent.feedback(ownedCountries)
+        #self.attackAgent.feedback(ownedCountries, allCountries)
         self.fortifyingAgent.feedback(ownedCountries)
 
     # Choose a starting country one at the time
@@ -149,7 +149,7 @@ class CarreRougeAI(AI):
     #
     # default behaviour : do nothing
     def onAttackWon(self, attackResult, ownedCountries, allCountries):
-        pass
+        self.attackAgent.onAttackResult(1, ownedCountries.values())
 
     # Called when your AI loses an attack. AKA the attack finished because you only have 1 troop left in
     # the attacking country
@@ -162,7 +162,7 @@ class CarreRougeAI(AI):
     #
     # default behaviour : do nothing
     def onAttackLost(self, attackResult, ownedCountries, allCountries):
-        pass
+        self.attackAgent.onAttackResult(-1, ownedCountries.values())
 
     # Called when your AI succeeds to defend a territory.
     #

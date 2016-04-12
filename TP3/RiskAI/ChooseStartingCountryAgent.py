@@ -7,9 +7,9 @@ from Glie import glie
 # Agent pour choisir les pays de départ
 # Adapté de l'agent de TicTacToe de Michel Gagnon
 class ChooseStartingCountryAgent(Agent):
-    def __init__(self, gamma):
+    def __init__(self, gamma, filename):
         Agent.__init__(self)
-        self._fileName = "startingCountry.pickle"
+        self._fileName = filename + "startingCountry.pickle"
         self.gamma = gamma
         self.load()
         self.lastState = None

@@ -126,7 +126,7 @@ class Controller:
 
         self._turn = 1 - self._turn
         if ai is not self.learningAI and self._gameState == self.PLAY_STATE:
-            self.learningAI.feedback(self._players[self._turn]._ownedCountries)
+            self.learningAI.feedback(self._players[self._turn]._ownedCountries, self._map._countries)
 
     def _print(self):
         print "TURN", self._step

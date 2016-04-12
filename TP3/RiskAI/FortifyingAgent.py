@@ -6,9 +6,9 @@ from Agent import Agent
 from MoveAction import MoveAction
 
 class FortifyingAgent(Agent):
-    def __init__(self, gamma):
+    def __init__(self, gamma, filename):
         Agent.__init__(self)
-        self._fileName = "fortify.pickle"
+        self._fileName = filename + "fortify.pickle"
         self.load()
         self.gamma = gamma
         self.lastState = None
@@ -27,7 +27,7 @@ class FortifyingAgent(Agent):
         possibleActions = self.getPossibleActions(ownedCountries.values())
         currentAction = None
         if possibleActions:
-            currentAction = glie(self, currentState, 1.1, 10, possibleActions)
+            currentAction = glie(self, currentState, 1.1, 100, possibleActions)
 
         self.lastState = currentState
         self.lastAction = currentAction
@@ -53,13 +53,18 @@ class FortifyingAgent(Agent):
     def isInDanger(self, ownedCountry):
         inDanger = False
         for country in ownedCountry.getNeighbours():
-            if country.getOwner is not ownedCountry.getOwner():
-                inDanger = country.getNbTroops() > ownedCountry.getNbTroops()
+            if country.getOwner() != ownedCountry.getOwner():
+                inDanger = country.getNbTroops() >= ownedCountry.getNbTroops()
         return inDanger
 
 
     def getScore(self, ownedCountries):
-        return len(ownedCountries)
+        score = 0
+        for country in ownedCountries.values():
+            for voisin in country.getNeighbours():
+                if country.getOwner() != voisin.getOwner():
+                    score += country.getNbTroops() - voisin.getNbTroops()
+        return score
 
     def feedback(self, ownedCountries):
         if not self.lastAction and not self.lastState:
