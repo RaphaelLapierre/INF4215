@@ -2,6 +2,7 @@ import signal
 from Controller import *
 from RandomAI import *
 from CarreRougeAi import CarreRougeAI
+from FMAI import FMAI
 
 import csv
 
@@ -13,16 +14,17 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-ai1 = CarreRougeAI(1, "Gamma1") # agent adverse sans apprentissage machine
-ai2 = CarreRougeAI(1, "SelfLearningGamma1") # agent adverse aleatoire
+#ai1 = CarreRougeAI(1, "Gamma1") # agent adverse sans apprentissage machine
+ai1 = FMAI(1)
+#ai2 = CarreRougeAI(1, "SelfLearningGamma1") # agent adverse aleatoire
 #ai1 = RandomAI() # agent adverse sans apprentissage machine
-#ai2 = CarreRougeAI(1, "Gamma1") # agent adverse aleatoire
+ai2 = CarreRougeAI(1, "Gamma1") # agent adverse aleatoire
 
 
 nbWinAI2 = 0
 winRate = []
 lastTenWin = 0
-for i in xrange(5000):
+for i in xrange(1000):
 
     #if i%2:
     #    ai1 = AI()

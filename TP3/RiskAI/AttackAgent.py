@@ -48,7 +48,7 @@ class AttackAgent(Agent):
         self.lastScore = self.getScore(ownedCountries, allCountries)
 
         if len(attackActionList) == 0:
-            self.onAttackResult(0, ownedCountries)
+            self.onAttackResult(-0.5, ownedCountries)
 
         return attackActionList
 
